@@ -1,0 +1,2 @@
+# cluster-ipteca-screenshot-bot
+
