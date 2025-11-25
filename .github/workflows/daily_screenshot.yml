@@ -1,0 +1,40 @@
+name: Daily Cluster Screenshot
+
+on:
+  schedule:
+    # UTC 0:00 = JST 9:00
+    - cron: '0 0 * * *'
+    # UTC 8:00 = JST 17:00
+    - cron: '0 8 * * *'
+  workflow_dispatch: {}  # 手動実行用
+
+jobs:
+  screenshot:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install playwright requests
+          python -m playwright install --with-deps chromium
+
+      - name: Run screenshot script
+        env:
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
+        run: |
+          python take_screenshot.py
+
+      - name: Upload screenshots as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cluster-screenshot-${{ github.run_number }}
+          path: screenshots/
+
