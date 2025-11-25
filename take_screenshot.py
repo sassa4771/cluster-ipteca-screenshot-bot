@@ -1,12 +1,12 @@
 import os
 from datetime import datetime
 import traceback
-import requests
+import requests  # Teams通知用（関数内で使用、現在は呼び出し無効化）
 from playwright.sync_api import sync_playwright
 
 URL = "https://cluster.mu/search?q=IPTeCA&type=world"
 SAVE_DIR = "screenshots"
-TEAMS_WEBHOOK_URL = os.environ.get("TEAMS_WEBHOOK_URL")  # GitHub Secrets から渡す
+TEAMS_WEBHOOK_URL = None  # os.environ.get("TEAMS_WEBHOOK_URL")  # GitHub Secrets から渡す（現在は無効化）
 
 
 def send_teams_message(title: str, text: str):
@@ -53,13 +53,13 @@ def run():
         filename = take_screenshot()
         msg_title = "Cluster検索スクリーンショット取得：✅ 成功"
         msg_text = f"スクリーンショットを取得しました。\n\n`{filename}`"
-        send_teams_message(msg_title, msg_text)
+        # send_teams_message(msg_title, msg_text)  # Teams通知（現在は無効化）
         print(msg_title, filename)
     except Exception:
         err = traceback.format_exc()
         msg_title = "Cluster検索スクリーンショット取得：❌ エラー"
         msg_text = f"実行中にエラーが発生しました。\n\n```\n{err}\n```"
-        send_teams_message(msg_title, msg_text)
+        # send_teams_message(msg_title, msg_text)  # Teams通知（現在は無効化）
         print(msg_title)
         print(err)
         raise
