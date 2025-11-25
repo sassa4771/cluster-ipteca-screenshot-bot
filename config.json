@@ -1,0 +1,12 @@
+{
+  "screenshot": {
+    "url": "https://cluster.mu/search?q=IPTeCA&type=world",
+    "save_dir": "screenshots"
+  },
+  "notification": {
+    "enable_notify": false,
+    "teams_workflow_url": "",
+    "time_window_sec": 600
+  }
+}
+
