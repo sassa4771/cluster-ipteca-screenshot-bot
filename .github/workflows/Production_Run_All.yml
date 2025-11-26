@@ -38,10 +38,6 @@ jobs:
         run: |
           python take_screenshot.py
 
-      - name: Wait 10 seconds
-        run: |
-          sleep 10
-
       - name: Check result and notify
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
