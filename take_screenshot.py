@@ -22,9 +22,21 @@ def take_screenshot():
     
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
+        page = browser.new_page(viewport={"width": 1920, "height": 1080})
         page.goto(url)
         page.wait_for_load_state("networkidle")
+        
+        # Cookieバナーの閉鎖処理
+        for selector in ["text=Allow all", "text=すべて許可"]:
+            try:
+                page.click(selector, timeout=3000)
+                break
+            except:
+                pass
+        
+        # 下部までスクロールして表示を更新
+        page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+        page.wait_for_timeout(1500)
         
         # GitHub Actions は UTC で動くため、YYYYMMDD_HHMMSS_UTC 形式のタイムスタンプを生成
         timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S_UTC")

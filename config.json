@@ -4,9 +4,8 @@
     "save_dir": "screenshots"
   },
   "notification": {
-    "enable_notify": false,
-    "teams_workflow_url": "",
+    "enable_notify": true,
+    "target": "discord",
     "time_window_sec": 600
   }
 }
-

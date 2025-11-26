@@ -36,6 +36,7 @@ jobs:
 
       - name: Check result and (optionally) notify
         env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           TEAMS_WORKFLOW_URL: ${{ secrets.TEAMS_WORKFLOW_URL }}
         run: |
           python notify_result.py
