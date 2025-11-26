@@ -7,6 +7,7 @@ Cluster検索結果のスクリーンショットを自動取得し、Discord通
 - **スクリーンショット取得**: 指定URLのスクリーンショットを自動取得（1920x1080、full_page）
 - **Discord通知**: スクリーンショット取得の成否をDiscordに通知（画像添付あり）
 - **Gitリポジトリ保存**: 取得したスクリーンショットをリポジトリの`screenshots/`に自動コミット・プッシュ
+- **グラフ作成**: スクリーンショット取得履歴を解析してグラフを作成（`graphs/`フォルダに保存）
 
 ## 構成
 
@@ -14,6 +15,7 @@ Cluster検索結果のスクリーンショットを自動取得し、Discord通
 
 - `take_screenshot.py` - スクリーンショット取得専用
 - `notify_discord.py` - Discord通知専用
+- `analyze_screenshots.py` - スクリーンショット解析・グラフ作成専用
 
 ### ワークフロー
 
@@ -131,8 +133,10 @@ python notify_discord.py
 cluster-ipteca-screenshot-bot/
 ├── take_screenshot.py          # スクリーンショット取得スクリプト
 ├── notify_discord.py           # Discord通知スクリプト
+├── analyze_screenshots.py      # スクリーンショット解析・グラフ作成スクリプト
 ├── config.json                 # 設定ファイル
 ├── screenshots/                # スクリーンショット保存ディレクトリ（Gitにコミットされる）
+├── graphs/                     # グラフ保存ディレクトリ
 └── .github/
     └── workflows/
         ├── Production_Run_All.yml         # 全体実行（本番）
@@ -144,6 +148,7 @@ cluster-ipteca-screenshot-bot/
 
 - **take_screenshot.py**: `playwright`
 - **notify_discord.py**: `requests`
+- **analyze_screenshots.py**: `pandas`, `matplotlib`
 
 ## トラブルシューティング
 
