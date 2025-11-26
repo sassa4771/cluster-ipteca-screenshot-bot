@@ -150,16 +150,18 @@ python upload_pcloud.py
 
 ```
 cluster-ipteca-screenshot-bot/
-├── take_screenshot.py      # スクリーンショット取得スクリプト
-├── notify_discord.py        # Discord通知スクリプト
-├── upload_pcloud.py         # pCloudアップロードスクリプト
-├── config.json              # 設定ファイル
-├── screenshots/             # スクリーンショット保存ディレクトリ
+├── take_screenshot.py          # スクリーンショット取得スクリプト
+├── notify_discord.py           # Discord通知スクリプト
+├── upload_pcloud.py            # pCloudアップロードスクリプト
+├── config.json                 # 設定ファイル
+├── screenshots/                # スクリーンショット保存ディレクトリ
 └── .github/
     └── workflows/
-        ├── screenshot.yml        # スクリーンショット取得ワークフロー
-        ├── notify_discord.yml    # Discord通知ワークフロー
-        └── upload_pcloud.yml      # pCloudアップロードワークフロー
+        ├── screenshot.yml           # スクリーンショット取得（本番）
+        ├── notify_discord.yml      # Discord通知（本番）
+        ├── upload_pcloud.yml       # pCloudアップロード（本番）
+        ├── test_quick.yml           # 全体テスト（テスト用）
+        └── test_screenshot_only.yml # スクリーンショットのみテスト（テスト用）
 ```
 
 ## 依存関係
