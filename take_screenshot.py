@@ -2,6 +2,7 @@ import os
 import sys
 import json
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from playwright.sync_api import sync_playwright
 
 
@@ -39,8 +40,9 @@ def take_screenshot():
         page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
         page.wait_for_timeout(1500)
         
-        # GitHub Actions は UTC で動くため、YYYYMMDD_HHMMSS_UTC 形式のタイムスタンプを生成
-        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S_UTC")
+        # 日本時間（JST）でYYYYMMDD_HHMMSS_JST形式のタイムスタンプを生成
+        jst = ZoneInfo("Asia/Tokyo")
+        timestamp = datetime.now(jst).strftime("%Y%m%d_%H%M%S_JST")
         filename = f"{save_dir}/IPTeCA_{timestamp}.png"
         page.screenshot(path=filename, full_page=True)
         browser.close()
