@@ -8,33 +8,42 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import font_manager
 
-# 日本語フォントの設定（GitHub Actions環境用）
+# 日本語フォントの設定
 def setup_japanese_font():
     """日本語フォントを設定する"""
+    font_path = "NotoSansJP-VariableFont_wght.ttf"
+    
     try:
-        # GitHub Actions環境ではNoto Sans JPが利用可能
-        # システムフォントを探す
-        font_list = font_manager.findSystemFonts()
-        japanese_fonts = []
-        for font_path in font_list:
-            try:
-                font_name = font_manager.get_font(font_path).family_name
-                if 'Noto' in font_name or 'Sans' in font_name or 'JP' in font_name:
-                    japanese_fonts.append(font_path)
-            except:
-                pass
-        
-        if japanese_fonts:
-            # 最初に見つかったフォントを使用
-            font_path = japanese_fonts[0]
+        if os.path.exists(font_path):
+            # リポジトリに配置されたフォントファイルを使用
             font_manager.fontManager.addfont(font_path)
             font_prop = font_manager.FontProperties(fname=font_path)
             plt.rcParams["font.family"] = font_prop.get_name()
-            print(f"日本語フォントを設定しました: {font_prop.get_name()}")
+            print(f"日本語フォントを設定しました: {font_prop.get_name()} ({font_path})")
         else:
-            # フォールバック: デフォルトフォントを使用
-            plt.rcParams["font.family"] = "DejaVu Sans"
-            print("警告: 日本語フォントが見つかりませんでした。デフォルトフォントを使用します。")
+            # フォントファイルが見つからない場合、システムフォントを探す
+            print(f"警告: {font_path} が見つかりません。システムフォントを検索します...")
+            font_list = font_manager.findSystemFonts()
+            japanese_fonts = []
+            for sys_font_path in font_list:
+                try:
+                    font_name = font_manager.get_font(sys_font_path).family_name
+                    if 'Noto' in font_name or 'Sans' in font_name or 'JP' in font_name:
+                        japanese_fonts.append(sys_font_path)
+                except:
+                    pass
+            
+            if japanese_fonts:
+                # 最初に見つかったフォントを使用
+                sys_font_path = japanese_fonts[0]
+                font_manager.fontManager.addfont(sys_font_path)
+                font_prop = font_manager.FontProperties(fname=sys_font_path)
+                plt.rcParams["font.family"] = font_prop.get_name()
+                print(f"システムフォントを使用しました: {font_prop.get_name()}")
+            else:
+                # フォールバック: デフォルトフォントを使用
+                plt.rcParams["font.family"] = "DejaVu Sans"
+                print("警告: 日本語フォントが見つかりませんでした。デフォルトフォントを使用します。")
     except Exception as e:
         print(f"フォント設定でエラーが発生しました: {e}")
         plt.rcParams["font.family"] = "DejaVu Sans"
