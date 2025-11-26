@@ -23,7 +23,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install requests
+          pip install playwright requests
+          python -m playwright install --with-deps chromium
+
+      - name: Take screenshot (if not exists)
+        run: |
+          python take_screenshot.py || echo "Screenshot already exists or failed"
 
       - name: Upload to pCloud
         env:
