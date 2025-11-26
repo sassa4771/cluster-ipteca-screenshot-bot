@@ -22,7 +22,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -49,14 +49,16 @@ jobs:
           python notify_discord.py
 
       - name: Commit and push screenshots
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add screenshots/
-          git diff --staged --quiet || git commit -m "Add screenshot: $(date -u +'%Y%m%d_%H%M%S_UTC')"
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Add screenshot: $(date -u +'%Y%m%d_%H%M%S_UTC')"
+            git push
+          fi
 
       - name: Upload screenshots as artifact
         uses: actions/upload-artifact@v4
