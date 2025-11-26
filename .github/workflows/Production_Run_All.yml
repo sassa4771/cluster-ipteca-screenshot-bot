@@ -32,7 +32,6 @@ jobs:
         run: |
           python take_screenshot.py
 
-
       - name: Commit and push screenshots
         run: |
           git config --local user.email "action@github.com"
