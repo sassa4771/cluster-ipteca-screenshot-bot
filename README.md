@@ -21,8 +21,10 @@ Cluster検索結果のスクリーンショットを自動取得し、Discord通
 
 #### 本番用（自動実行）
 
-- `Production_Run_All.yml` - 全体実行（6:00 / 13:00 / 18:00 / 24:00 JST）
+- `Production_Screenshot_Notify.yml` - スクリーンショット取得・通知（6:00 / 13:00 / 18:00 / 24:00 JST）
   - スクリーンショット取得 → Gitにコミット・プッシュ → Discord通知
+- `Production_Analyze_Screenshots.yml` - スクリーンショット解析・グラフ作成（24:00 JST、毎日1回）
+  - スクリーンショット履歴を解析してグラフを作成 → Gitにコミット・プッシュ
 
 #### テスト用（手動実行のみ）
 
@@ -80,8 +82,10 @@ GitHubリポジトリの **Settings** → **Secrets and variables** → **Action
 
 本番用ワークフローは以下のスケジュールで自動実行されます：
 
-- **Production_Run_All**: 毎日 JST 6:00 / 13:00 / 18:00 / 24:00
+- **Production_Screenshot_Notify**: 毎日 JST 6:00 / 13:00 / 18:00 / 24:00
   - スクリーンショット取得 → Gitにコミット・プッシュ → Discord通知
+- **Production_Analyze_Screenshots**: 毎日 JST 24:00（1日1回）
+  - スクリーンショット履歴を解析してグラフを作成 → Gitにコミット・プッシュ
 
 ### 手動実行
 
@@ -139,9 +143,8 @@ cluster-ipteca-screenshot-bot/
 ├── graphs/                     # グラフ保存ディレクトリ
 └── .github/
     └── workflows/
-        ├── Production_Run_All.yml         # 全体実行（本番）
-        ├── Test_Quick.yml                 # 全体テスト（テスト用）
-        └── Test_Screenshot_Only.yml       # スクリーンショットのみテスト（テスト用）
+        ├── Production_Screenshot_Notify.yml    # スクリーンショット取得・通知（本番）
+        └── Production_Analyze_Screenshots.yml  # スクリーンショット解析・グラフ作成（本番）
 ```
 
 ## 依存関係

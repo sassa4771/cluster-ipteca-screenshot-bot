@@ -1,4 +1,4 @@
-name: Production Run All
+name: Production Screenshot & Notify
 
 permissions:
   contents: write
@@ -16,7 +16,7 @@ on:
   workflow_dispatch: {}  # 手動実行用
 
 jobs:
-  run_all:
+  screenshot_and_notify:
     runs-on: ubuntu-latest
 
     steps:
@@ -38,7 +38,6 @@ jobs:
       - name: Take screenshot
         run: |
           python take_screenshot.py
-
 
       - name: Commit and push screenshots
         run: |
