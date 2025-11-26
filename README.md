@@ -14,6 +14,7 @@ Cluster検索結果のスクリーンショットを自動取得し、Discord通
 ### スクリプト
 
 - `take_screenshot.py` - スクリーンショット取得専用
+- `fetch_html.py` - HTML取得専用
 - `notify_discord.py` - Discord通知専用
 - `analyze_screenshots.py` - スクリーンショット解析・グラフ作成専用
 
@@ -21,8 +22,8 @@ Cluster検索結果のスクリーンショットを自動取得し、Discord通
 
 #### 本番用（自動実行）
 
-- `Production_Screenshot_Notify.yml` - スクリーンショット取得・通知（6:00 / 13:00 / 18:00 / 24:00 JST）
-  - スクリーンショット取得 → Gitにコミット・プッシュ → Discord通知
+- `Production_Screenshot_Notify.yml` - スクリーンショット・HTML取得・通知（6:00 / 13:00 / 18:00 / 24:00 JST）
+  - スクリーンショット取得 → HTML取得 → Gitにコミット・プッシュ → Discord通知
 - `Production_Analyze_Screenshots.yml` - スクリーンショット解析・グラフ作成（24:00 JST、毎日1回）
   - スクリーンショット履歴を解析してグラフを作成 → Gitにコミット・プッシュ
 
@@ -83,7 +84,7 @@ GitHubリポジトリの **Settings** → **Secrets and variables** → **Action
 本番用ワークフローは以下のスケジュールで自動実行されます：
 
 - **Production_Screenshot_Notify**: 毎日 JST 6:00 / 13:00 / 18:00 / 24:00
-  - スクリーンショット取得 → Gitにコミット・プッシュ → Discord通知
+  - スクリーンショット取得 → HTML取得 → Gitにコミット・プッシュ → Discord通知
 - **Production_Analyze_Screenshots**: 毎日 JST 24:00（1日1回）
   - スクリーンショット履歴を解析してグラフを作成 → Gitにコミット・プッシュ
 
@@ -102,6 +103,14 @@ GitHubリポジトリの **Settings** → **Secrets and variables** → **Action
 pip install playwright requests
 python -m playwright install --with-deps chromium
 python take_screenshot.py
+```
+
+#### HTML取得
+
+```bash
+pip install playwright requests
+python -m playwright install --with-deps chromium
+python fetch_html.py
 ```
 
 #### Discord通知
@@ -136,10 +145,12 @@ python notify_discord.py
 ```
 cluster-ipteca-screenshot-bot/
 ├── take_screenshot.py          # スクリーンショット取得スクリプト
+├── fetch_html.py               # HTML取得スクリプト
 ├── notify_discord.py           # Discord通知スクリプト
 ├── analyze_screenshots.py      # スクリーンショット解析・グラフ作成スクリプト
 ├── config.json                 # 設定ファイル
 ├── screenshots/                # スクリーンショット保存ディレクトリ（Gitにコミットされる）
+├── html/                       # HTML保存ディレクトリ（Gitにコミットされる）
 ├── graphs/                     # グラフ保存ディレクトリ
 └── .github/
     └── workflows/

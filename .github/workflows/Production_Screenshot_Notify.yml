@@ -39,15 +39,19 @@ jobs:
         run: |
           python take_screenshot.py
 
-      - name: Commit and push screenshots
+      - name: Fetch HTML
+        run: |
+          python fetch_html.py
+
+      - name: Commit and push screenshots and HTML
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add screenshots/
+          git add screenshots/ html/
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Add screenshot: $(TZ=Asia/Tokyo date +'%Y%m%d_%H%M%S_JST')"
+            git commit -m "Add screenshot and HTML: $(TZ=Asia/Tokyo date +'%Y%m%d_%H%M%S_JST')"
             git push
           fi
 
