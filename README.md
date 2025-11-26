@@ -19,8 +19,8 @@ Cluster検索結果のスクリーンショットを自動取得し、Discord通
 
 #### 本番用（自動実行）
 
-- `Production_Run_All.yml` - 全体実行（9:00 / 17:00 JST）
-  - スクリーンショット取得 → 10秒待機 → Discord通知 → Gitにコミット・プッシュ
+- `Production_Run_All.yml` - 全体実行（6:00 / 13:00 / 18:00 / 24:00 JST）
+  - スクリーンショット取得 → Gitにコミット・プッシュ → Discord通知
 
 #### テスト用（手動実行のみ）
 
@@ -78,8 +78,8 @@ GitHubリポジトリの **Settings** → **Secrets and variables** → **Action
 
 本番用ワークフローは以下のスケジュールで自動実行されます：
 
-- **Production_Run_All**: 毎日 JST 9:00 / 17:00
-  - スクリーンショット取得 → 10秒待機 → Discord通知 → Gitにコミット・プッシュ
+- **Production_Run_All**: 毎日 JST 6:00 / 13:00 / 18:00 / 24:00
+  - スクリーンショット取得 → Gitにコミット・プッシュ → Discord通知
 
 ### 手動実行
 
@@ -116,17 +116,14 @@ python notify_discord.py
    - 1920x1080のviewportでfull_pageスクリーンショットを取得
    - `screenshots/IPTeCA_YYYYMMDD_HHMMSS_UTC.png` に保存
 
-2. **10秒待機**
-   - スクリーンショットファイルの作成を確実にするため
+2. **Gitにコミット・プッシュ**
+   - スクリーンショットをリポジトリの`screenshots/`にコミット（コミットメッセージはJST時刻）
+   - 自動的にプッシュしてGitHub上で確認可能に
 
 3. **Discord通知**
    - 最新のスクリーンショットファイルを検索
    - 更新時刻をチェック（`time_window_sec`以内なら成功）
    - 結果をDiscordに通知（画像添付あり）
-
-4. **Gitにコミット・プッシュ**
-   - スクリーンショットをリポジトリの`screenshots/`にコミット
-   - 自動的にプッシュしてGitHub上で確認可能に
 
 ## ファイル構成
 
