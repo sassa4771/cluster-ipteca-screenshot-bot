@@ -182,12 +182,68 @@ def create_hourly_distribution_graph(data, output_dir):
     return output_path
 
 
+def save_to_csv(data, output_dir):
+    """スクリーンショット情報をCSVに保存"""
+    if not data:
+        print("CSVに保存するデータがありません。")
+        return None
+    
+    df = pd.DataFrame(data)
+    # 日時情報を文字列形式に変換（CSV保存用）
+    df_csv = df.copy()
+    df_csv["date_str"] = df_csv["date"].dt.strftime("%Y-%m-%d %H:%M:%S")
+    df_csv["date_only"] = df_csv["date"].dt.strftime("%Y-%m-%d")
+    df_csv["time_only"] = df_csv["date"].dt.strftime("%H:%M:%S")
+    df_csv["hour"] = df_csv["date"].dt.hour
+    df_csv["file_date_str"] = df_csv["file_date"].dt.strftime("%Y-%m-%d %H:%M:%S")
+    
+    # CSV用の列を選択
+    csv_columns = ["filename", "date_str", "date_only", "time_only", "hour", "file_date_str", "file_path"]
+    df_csv_output = df_csv[csv_columns].copy()
+    df_csv_output = df_csv_output.sort_values("date_str")
+    
+    # CSVを保存
+    os.makedirs(output_dir, exist_ok=True)
+    csv_path = os.path.join(output_dir, "screenshot_data.csv")
+    df_csv_output.to_csv(csv_path, index=False, encoding="utf-8-sig")
+    
+    print(f"CSVファイルを保存しました: {csv_path}")
+    return csv_path
+
+
+def load_from_csv(csv_path):
+    """CSVファイルからスクリーンショット情報を読み込む"""
+    if not os.path.exists(csv_path):
+        print(f"エラー: CSVファイルが見つかりません: {csv_path}")
+        return None
+    
+    df = pd.read_csv(csv_path, encoding="utf-8-sig")
+    jst = ZoneInfo("Asia/Tokyo")
+    
+    # 日時文字列をdatetimeオブジェクトに変換
+    df["date"] = pd.to_datetime(df["date_str"]).dt.tz_localize(jst)
+    df["file_date"] = pd.to_datetime(df["file_date_str"]).dt.tz_localize(jst)
+    
+    # データ形式を統一
+    data = []
+    for _, row in df.iterrows():
+        data.append({
+            "filename": row["filename"],
+            "date": row["date"],
+            "file_date": row["file_date"],
+            "file_path": row["file_path"]
+        })
+    
+    return data
+
+
 def analyze_screenshots():
     """スクリーンショットを解析してグラフを作成"""
     config = load_config()
     screenshot_config = config["screenshot"]
     save_dir = screenshot_config["save_dir"]
     output_dir = "graphs"
+    csv_path = os.path.join(output_dir, "screenshot_data.csv")
     
     # 日本語フォントを設定
     setup_japanese_font()
@@ -202,12 +258,22 @@ def analyze_screenshots():
     
     print(f"スクリーンショットファイルを {len(data)} 件見つけました。")
     
+    # CSVに保存
+    save_to_csv(data, output_dir)
+    
+    # CSVから読み込んでグラフを作成（CSVが存在する場合はCSVから、そうでない場合は直接データから）
+    if os.path.exists(csv_path):
+        print(f"CSVファイルからデータを読み込みます: {csv_path}")
+        data_from_csv = load_from_csv(csv_path)
+        if data_from_csv:
+            data = data_from_csv
+    
     # グラフを作成
     create_timeline_graph(data, output_dir)
     create_daily_count_graph(data, output_dir)
     create_hourly_distribution_graph(data, output_dir)
     
-    print(f"\nすべてのグラフを {output_dir}/ フォルダに保存しました。")
+    print(f"\nすべてのグラフとCSVを {output_dir}/ フォルダに保存しました。")
 
 
 if __name__ == "__main__":

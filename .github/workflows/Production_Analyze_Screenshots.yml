@@ -32,7 +32,7 @@ jobs:
         run: |
           python analyze_screenshots.py
 
-      - name: Commit and push graphs
+      - name: Commit and push graphs and CSV
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
@@ -40,7 +40,7 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Update graphs: $(TZ=Asia/Tokyo date +'%Y%m%d_%H%M%S_JST')"
+            git commit -m "Update graphs and CSV: $(TZ=Asia/Tokyo date +'%Y%m%d_%H%M%S_JST')"
             git push
           fi
 
