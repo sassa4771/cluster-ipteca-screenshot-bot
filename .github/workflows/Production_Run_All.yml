@@ -11,6 +11,8 @@ on:
 jobs:
   run_all:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repo
@@ -40,11 +42,15 @@ jobs:
         run: |
           python notify_discord.py
 
-      - name: Upload to pCloud
+      - name: Commit and push screenshots
         env:
-          PCLOUD_UPLOAD_CODE: ${{ secrets.PCLOUD_UPLOAD_CODE }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python upload_pcloud.py
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add screenshots/
+          git diff --staged --quiet || git commit -m "Add screenshot: $(date -u +'%Y%m%d_%H%M%S_UTC')"
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
 
       - name: Upload screenshots as artifact
         uses: actions/upload-artifact@v4

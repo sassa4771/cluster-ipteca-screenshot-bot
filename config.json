@@ -7,9 +7,5 @@
     "enable_notify": true,
     "target": "discord",
     "time_window_sec": 600
-  },
-  "pcloud": {
-    "enable_upload": true,
-    "remote_dir": "/IPTeCA_Cluster_Screenshots"
   }
 }
