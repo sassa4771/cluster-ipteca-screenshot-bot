@@ -1,5 +1,8 @@
 name: Test Screenshot Only
 
+permissions:
+  contents: write
+
 on:
   workflow_dispatch: {}  # 手動実行用のみ
 
@@ -25,9 +28,20 @@ jobs:
         run: |
           python take_screenshot.py
 
+      - name: Commit and push screenshots
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add screenshots/
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Add screenshot: $(date -u +'%Y%m%d_%H%M%S_UTC')"
+            git push
+          fi
+
       - name: Upload screenshots as artifact
         uses: actions/upload-artifact@v4
         with:
           name: test-screenshot-only-${{ github.run_number }}
           path: screenshots/
-
