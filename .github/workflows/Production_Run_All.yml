@@ -38,12 +38,6 @@ jobs:
         run: |
           python take_screenshot.py
 
-      - name: Check result and notify
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        run: |
-          python notify_discord.py
-
       - name: Commit and push screenshots
         run: |
           git config --local user.email "action@github.com"
@@ -55,6 +49,12 @@ jobs:
             git commit -m "Add screenshot: $(date -u +'%Y%m%d_%H%M%S_UTC')"
             git push
           fi
+
+      - name: Check result and notify
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          python notify_discord.py
 
       - name: Upload screenshots as artifact
         uses: actions/upload-artifact@v4
