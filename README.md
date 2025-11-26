@@ -16,7 +16,7 @@ Cluster検索結果のスクリーンショットを自動取得し、Discord通
 - `take_screenshot.py` - スクリーンショット取得専用
 - `fetch_html.py` - HTML取得専用
 - `notify_discord.py` - Discord通知専用
-- `analyze_screenshots.py` - スクリーンショット解析・グラフ作成専用
+- `analyze_html.py` - HTML解析・グラフ作成専用（HTMLファイルからデータを取得）
 
 ### ワークフロー
 
