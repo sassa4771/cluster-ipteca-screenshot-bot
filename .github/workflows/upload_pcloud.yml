@@ -1,0 +1,33 @@
+name: Upload to pCloud
+
+on:
+  schedule:
+    # JST 9:10
+    - cron: '10 0 * * *'
+    # JST 17:10
+    - cron: '10 8 * * *'
+  workflow_dispatch: {}  # 手動実行用
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install requests
+
+      - name: Upload to pCloud
+        env:
+          PCLOUD_UPLOAD_CODE: ${{ secrets.PCLOUD_UPLOAD_CODE }}
+        run: |
+          python upload_pcloud.py
+

@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 from datetime import datetime
 from playwright.sync_api import sync_playwright
@@ -48,5 +49,11 @@ def take_screenshot():
 
 
 if __name__ == "__main__":
-    filename = take_screenshot()
-    print(f"Saved screenshot: {filename}")
+    try:
+        filename = take_screenshot()
+        print(f"Saved screenshot: {filename}")
+    except Exception as e:
+        print(f"エラーが発生しました: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
