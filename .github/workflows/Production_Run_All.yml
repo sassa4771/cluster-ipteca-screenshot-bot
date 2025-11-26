@@ -1,5 +1,8 @@
 name: Production Run All
 
+permissions:
+  contents: write
+
 on:
   schedule:
     # JST 9:00
@@ -15,8 +18,6 @@ on:
 jobs:
   run_all:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
       - name: Checkout repo

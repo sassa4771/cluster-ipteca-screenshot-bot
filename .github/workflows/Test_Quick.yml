@@ -1,5 +1,8 @@
 name: Test Quick (No Wait)
 
+permissions:
+  contents: write
+
 on:
   workflow_dispatch: {}  # 手動実行用のみ
 
@@ -10,6 +13,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -34,6 +39,18 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
           python notify_discord.py
+
+      - name: Commit and push screenshots
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add screenshots/
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Add screenshot: $(date -u +'%Y%m%d_%H%M%S_UTC')"
+            git push
+          fi
 
       - name: Upload screenshots as artifact
         uses: actions/upload-artifact@v4
