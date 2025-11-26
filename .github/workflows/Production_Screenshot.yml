@@ -1,4 +1,4 @@
-name: Screenshot
+name: Production Screenshot
 
 on:
   schedule:

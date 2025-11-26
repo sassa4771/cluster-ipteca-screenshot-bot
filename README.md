@@ -20,14 +20,14 @@ Cluster検索結果のスクリーンショットを自動取得し、Discord通
 
 #### 本番用（自動実行）
 
-- `screenshot.yml` - スクリーンショット取得（9:00 / 17:00 JST）
-- `notify_discord.yml` - Discord通知（9:05 / 17:05 JST）
-- `upload_pcloud.yml` - pCloudアップロード（9:10 / 17:10 JST）
+- `Production_Screenshot.yml` - スクリーンショット取得（9:00 / 17:00 JST）
+- `Production_Notify_Discord.yml` - Discord通知（9:05 / 17:05 JST）
+- `Production_Upload_pCloud.yml` - pCloudアップロード（9:10 / 17:10 JST）
 
 #### テスト用（手動実行のみ）
 
-- `test_quick.yml` - 全体テスト（スクリーンショット → 通知 → pCloudアップロード、10秒待機）
-- `test_screenshot_only.yml` - スクリーンショット取得のみテスト
+- `Test_Quick.yml` - 全体テスト（スクリーンショット → 通知 → pCloudアップロード、10秒待機）
+- `Test_Screenshot_Only.yml` - スクリーンショット取得のみテスト
 
 各ワークフローは独立しており、`workflow_dispatch`で手動実行も可能です。
 
@@ -157,11 +157,11 @@ cluster-ipteca-screenshot-bot/
 ├── screenshots/                # スクリーンショット保存ディレクトリ
 └── .github/
     └── workflows/
-        ├── screenshot.yml           # スクリーンショット取得（本番）
-        ├── notify_discord.yml      # Discord通知（本番）
-        ├── upload_pcloud.yml       # pCloudアップロード（本番）
-        ├── test_quick.yml           # 全体テスト（テスト用）
-        └── test_screenshot_only.yml # スクリーンショットのみテスト（テスト用）
+        ├── Production_Screenshot.yml      # スクリーンショット取得（本番）
+        ├── Production_Notify_Discord.yml  # Discord通知（本番）
+        ├── Production_Upload_pCloud.yml   # pCloudアップロード（本番）
+        ├── Test_Quick.yml                 # 全体テスト（テスト用）
+        └── Test_Screenshot_Only.yml       # スクリーンショットのみテスト（テスト用）
 ```
 
 ## 依存関係

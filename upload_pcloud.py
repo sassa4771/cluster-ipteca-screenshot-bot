@@ -26,7 +26,8 @@ def get_latest_screenshot(save_dir):
 
 def upload_to_pcloud(file_path, upload_code, remote_dir):
     """pCloudにファイルをアップロード"""
-    url = f"https://api.pcloud.com/uploadtolink?code={upload_code}"
+    # pCloud APIのエンドポイント
+    url = "https://api.pcloud.com/uploadtolink"
     
     if not os.path.exists(file_path):
         print(f"エラー: ファイルが見つかりません: {file_path}")
@@ -47,15 +48,18 @@ def upload_to_pcloud(file_path, upload_code, remote_dir):
     
     try:
         # multipart/form-data でアップロード
+        # pCloud APIでは、codeはクエリパラメータまたはform-dataの両方で送信可能
         with open(file_path, "rb") as f:
             files = {
                 "file": (filename, f, "image/png")
             }
             data = {
+                "code": upload_code,
                 "filename": remote_path
             }
             
             print(f"アップロード中: {file_path} -> {remote_path}")
+            print(f"使用するcode: {upload_code[:10]}... (最初の10文字のみ表示)")
             r = requests.post(url, files=files, data=data, timeout=30)
             
             if r.status_code == 200:
@@ -98,7 +102,15 @@ def upload_latest_screenshot():
     if not upload_code:
         print("エラー: PCLOUD_UPLOAD_CODE が設定されていません。")
         print("GitHub Secrets に PCLOUD_UPLOAD_CODE を設定してください。")
+        print("\npCloud Upload linkのcodeの取得方法:")
+        print("1. pCloudでUpload linkを作成")
+        print("2. 生成されたURLからcodeを抽出")
+        print("   URL例: https://u.pcloud.link/publink/show?code=XXXXX")
+        print("   → codeは 'XXXXX' の部分です")
         sys.exit(1)
+    
+    # codeの前後の空白を削除
+    upload_code = upload_code.strip()
     
     # 最新ファイルを取得
     latest_file = get_latest_screenshot(save_dir)
