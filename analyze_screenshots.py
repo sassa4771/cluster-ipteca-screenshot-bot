@@ -182,32 +182,45 @@ def create_hourly_distribution_graph(data, output_dir):
     return output_path
 
 
-def save_to_csv(data, output_dir):
-    """スクリーンショット情報をCSVに保存"""
+def save_to_csv(data, output_dir, csv_path):
+    """スクリーンショット情報をCSVに保存（追記形式）"""
     if not data:
         print("CSVに保存するデータがありません。")
         return None
     
-    df = pd.DataFrame(data)
-    # 日時情報を文字列形式に変換（CSV保存用）
-    df_csv = df.copy()
-    df_csv["date_str"] = df_csv["date"].dt.strftime("%Y-%m-%d %H:%M:%S")
-    df_csv["date_only"] = df_csv["date"].dt.strftime("%Y-%m-%d")
-    df_csv["time_only"] = df_csv["date"].dt.strftime("%H:%M:%S")
-    df_csv["hour"] = df_csv["date"].dt.hour
-    df_csv["file_date_str"] = df_csv["file_date"].dt.strftime("%Y-%m-%d %H:%M:%S")
+    # 新しいデータをDataFrameに変換
+    df_new = pd.DataFrame(data)
+    df_new["date_str"] = df_new["date"].dt.strftime("%Y-%m-%d %H:%M:%S")
+    df_new["date_only"] = df_new["date"].dt.strftime("%Y-%m-%d")
+    df_new["time_only"] = df_new["date"].dt.strftime("%H:%M:%S")
+    df_new["hour"] = df_new["date"].dt.hour
+    df_new["file_date_str"] = df_new["file_date"].dt.strftime("%Y-%m-%d %H:%M:%S")
     
     # CSV用の列を選択
     csv_columns = ["filename", "date_str", "date_only", "time_only", "hour", "file_date_str", "file_path"]
-    df_csv_output = df_csv[csv_columns].copy()
-    df_csv_output = df_csv_output.sort_values("date_str")
+    df_new_output = df_new[csv_columns].copy()
+    
+    # 既存のCSVファイルがある場合は読み込む
+    if os.path.exists(csv_path):
+        print(f"既存のCSVファイルを読み込みます: {csv_path}")
+        df_existing = pd.read_csv(csv_path, encoding="utf-8-sig")
+        
+        # 既存のデータと新しいデータをマージ（重複を除去）
+        # filenameとdate_strの組み合わせで重複チェック
+        df_combined = pd.concat([df_existing, df_new_output], ignore_index=True)
+        df_combined = df_combined.drop_duplicates(subset=["filename", "date_str"], keep="last")
+        df_combined = df_combined.sort_values("date_str")
+        
+        print(f"既存データ: {len(df_existing)} 件、新規データ: {len(df_new_output)} 件、合計: {len(df_combined)} 件")
+    else:
+        print("既存のCSVファイルが見つかりません。新規作成します。")
+        df_combined = df_new_output.sort_values("date_str")
     
     # CSVを保存
     os.makedirs(output_dir, exist_ok=True)
-    csv_path = os.path.join(output_dir, "screenshot_data.csv")
-    df_csv_output.to_csv(csv_path, index=False, encoding="utf-8-sig")
+    df_combined.to_csv(csv_path, index=False, encoding="utf-8-sig")
     
-    print(f"CSVファイルを保存しました: {csv_path}")
+    print(f"CSVファイルを保存しました: {csv_path} (合計 {len(df_combined)} 件)")
     return csv_path
 
 
@@ -258,15 +271,16 @@ def analyze_screenshots():
     
     print(f"スクリーンショットファイルを {len(data)} 件見つけました。")
     
-    # CSVに保存
-    save_to_csv(data, output_dir)
+    # CSVに保存（追記形式）
+    save_to_csv(data, output_dir, csv_path)
     
-    # CSVから読み込んでグラフを作成（CSVが存在する場合はCSVから、そうでない場合は直接データから）
+    # グラフ作成用にCSVから全データを読み込む
     if os.path.exists(csv_path):
-        print(f"CSVファイルからデータを読み込みます: {csv_path}")
+        print(f"CSVファイルから全データを読み込みます: {csv_path}")
         data_from_csv = load_from_csv(csv_path)
         if data_from_csv:
             data = data_from_csv
+            print(f"CSVから {len(data)} 件のデータを読み込みました。")
     
     # グラフを作成
     create_timeline_graph(data, output_dir)
