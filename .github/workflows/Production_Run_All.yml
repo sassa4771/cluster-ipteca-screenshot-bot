@@ -30,9 +30,9 @@ jobs:
         run: |
           python take_screenshot.py
 
-      - name: Wait 5 minutes
+      - name: Wait 10 seconds
         run: |
-          sleep 300
+          sleep 10
 
       - name: Check result and notify
         env:
