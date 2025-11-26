@@ -37,8 +37,8 @@ def format_iso_jst(dt_utc):
     return dt_jst.isoformat()
 
 
-def send_discord(title: str, body_md: str):
-    """DiscordにWebhookで通知を送信"""
+def send_discord(title: str, body_md: str, image_path: str = None):
+    """DiscordにWebhookで通知を送信（画像添付可能）"""
     webhook_url = os.environ.get("DISCORD_WEBHOOK_URL")
     if not webhook_url:
         error_msg = "エラー: DISCORD_WEBHOOK_URL が設定されていません。通知を送信できません。"
@@ -49,15 +49,30 @@ def send_discord(title: str, body_md: str):
     # Discordのメッセージ形式: **title**\nbody_md
     content = f"**{title}**\n{body_md}"
     
-    payload = {
-        "content": content
-    }
-    
     try:
-        r = requests.post(webhook_url, json=payload, timeout=10)
+        # 画像ファイルがある場合はmultipart/form-dataで送信
+        if image_path and os.path.exists(image_path):
+            with open(image_path, "rb") as f:
+                files = {
+                    "file": (os.path.basename(image_path), f, "image/png")
+                }
+                data = {
+                    "content": content
+                }
+                r = requests.post(webhook_url, files=files, data=data, timeout=30)
+        else:
+            # 画像がない場合は通常のJSON送信
+            payload = {
+                "content": content
+            }
+            r = requests.post(webhook_url, json=payload, timeout=10)
+        
         # Discordは200または204を返す
         if r.status_code in [200, 204]:
-            print(f"Discord通知を送信しました。ステータスコード: {r.status_code}")
+            if image_path:
+                print(f"Discord通知を送信しました（画像添付あり）。ステータスコード: {r.status_code}")
+            else:
+                print(f"Discord通知を送信しました。ステータスコード: {r.status_code}")
             return True
         else:
             print(f"Discord通知で予期しないステータスコード: {r.status_code}")
@@ -65,6 +80,8 @@ def send_discord(title: str, body_md: str):
             sys.exit(1)
     except Exception as e:
         print(f"Discord通知でエラーが発生しました: {e}")
+        import traceback
+        traceback.print_exc()
         sys.exit(1)
 
 
@@ -89,7 +106,7 @@ def check_and_notify():
         # ファイルが一つも無ければ「失敗（ファイルなし）」扱い
         title = "Clusterスクリーンショット監視：失敗（新しいファイルなし）"
         body_md = "スクリーンショットファイルが見つかりませんでした。"
-        send_discord(title, body_md)
+        send_discord(title, body_md, image_path=None)
         return
     
     # 最新ファイルの mtime を UTC として取得
@@ -126,7 +143,8 @@ def check_and_notify():
             f"- **経過時間**: {int(age_sec)}秒（閾値: {time_window_sec}秒）"
         )
     
-    send_discord(title, body_md)
+    # 最新のスクリーンショットファイルを添付
+    send_discord(title, body_md, image_path=latest_file)
 
 
 if __name__ == "__main__":
