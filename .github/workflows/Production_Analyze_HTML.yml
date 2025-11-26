@@ -1,4 +1,4 @@
-name: Production Analyze Screenshots
+name: Production Analyze HTML
 
 permissions:
   contents: write
@@ -10,7 +10,7 @@ on:
   workflow_dispatch: {}  # 手動実行用
 
 jobs:
-  analyze_screenshots:
+  analyze_html:
     runs-on: ubuntu-latest
 
     steps:

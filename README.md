@@ -24,7 +24,7 @@ Cluster検索結果のスクリーンショットを自動取得し、Discord通
 
 - `Production_Screenshot_Notify.yml` - スクリーンショット・HTML取得・通知（6:00 / 13:00 / 18:00 / 24:00 JST）
   - スクリーンショット取得 → HTML取得 → Gitにコミット・プッシュ → Discord通知
-- `Production_Analyze_Screenshots.yml` - HTML解析・グラフ作成（24:00 JST、毎日1回）
+- `Production_Analyze_HTML.yml` - HTML解析・グラフ作成（24:00 JST、毎日1回）
   - HTMLファイル履歴を解析してグラフを作成 → Gitにコミット・プッシュ
 
 #### テスト用（手動実行のみ）
