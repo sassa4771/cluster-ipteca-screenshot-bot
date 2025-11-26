@@ -72,10 +72,6 @@ GitHubリポジトリの **Settings** → **Secrets and variables** → **Action
 
 - `DISCORD_WEBHOOK_URL`: Discord Webhook URL（通知機能を使用する場合）
 
-#### オプション
-
-- `TEAMS_WORKFLOW_URL`: Teams Workflow URL（Teams通知を使用する場合、未実装）
-
 ## 使用方法
 
 ### 自動実行
