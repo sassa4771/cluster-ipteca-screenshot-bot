@@ -1,4 +1,4 @@
-name: Upload to pCloud
+name: Production Upload to pCloud
 
 on:
   schedule:
