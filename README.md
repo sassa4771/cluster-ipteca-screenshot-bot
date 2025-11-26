@@ -114,7 +114,7 @@ python notify_discord.py
    - Cookieバナーを閉じる
    - ページ下部までスクロール
    - 1920x1080のviewportでfull_pageスクリーンショットを取得
-   - `screenshots/IPTeCA_YYYYMMDD_HHMMSS_UTC.png` に保存
+   - `screenshots/IPTeCA_YYYYMMDD_HHMMSS_JST.png` に保存
 
 2. **Gitにコミット・プッシュ**
    - スクリーンショットをリポジトリの`screenshots/`にコミット（コミットメッセージはJST時刻）
