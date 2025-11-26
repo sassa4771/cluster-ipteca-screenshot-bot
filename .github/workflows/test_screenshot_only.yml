@@ -1,0 +1,33 @@
+name: Test Screenshot Only
+
+on:
+  workflow_dispatch: {}  # 手動実行用のみ
+
+jobs:
+  test_screenshot:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install playwright requests
+          python -m playwright install --with-deps chromium
+
+      - name: Take screenshot
+        run: |
+          python take_screenshot.py
+
+      - name: Upload screenshots as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-screenshot-only-${{ github.run_number }}
+          path: screenshots/
+
