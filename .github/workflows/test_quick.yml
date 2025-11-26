@@ -32,9 +32,14 @@ jobs:
       - name: Check result and notify
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          TEAMS_WORKFLOW_URL: ${{ secrets.TEAMS_WORKFLOW_URL }}
         run: |
-          python notify_result.py
+          python notify_discord.py
+
+      - name: Upload to pCloud
+        env:
+          PCLOUD_UPLOAD_CODE: ${{ secrets.PCLOUD_UPLOAD_CODE }}
+        run: |
+          python upload_pcloud.py
 
       - name: Upload screenshots as artifact
         uses: actions/upload-artifact@v4
