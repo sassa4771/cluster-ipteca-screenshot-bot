@@ -55,9 +55,9 @@ def load_config():
         return json.load(f)
 
 
-def get_screenshot_files(save_dir):
-    """screenshotsフォルダ内の画像ファイルを取得し、日時情報を抽出"""
-    pattern = os.path.join(save_dir, "*.png")
+def get_html_files(html_dir):
+    """htmlフォルダ内のHTMLファイルを取得し、日時情報を抽出"""
+    pattern = os.path.join(html_dir, "*.html")
     files = glob.glob(pattern)
     
     data = []
@@ -65,11 +65,11 @@ def get_screenshot_files(save_dir):
     
     for file_path in files:
         filename = os.path.basename(file_path)
-        # IPTeCA_YYYYMMDD_HHMMSS_JST.png 形式から日時を抽出
+        # IPTeCA_YYYYMMDD_HHMMSS_JST.html 形式から日時を抽出
         try:
             # ファイル名から日時部分を抽出
-            if filename.startswith("IPTeCA_") and filename.endswith("_JST.png"):
-                timestamp_str = filename.replace("IPTeCA_", "").replace("_JST.png", "")
+            if filename.startswith("IPTeCA_") and filename.endswith("_JST.html"):
+                timestamp_str = filename.replace("IPTeCA_", "").replace("_JST.html", "")
                 # YYYYMMDD_HHMMSS 形式をパース
                 dt = datetime.strptime(timestamp_str, "%Y%m%d_%H%M%S")
                 # JSTとして設定
@@ -112,7 +112,7 @@ def create_timeline_graph(data, output_dir):
     
     # グラフを保存
     os.makedirs(output_dir, exist_ok=True)
-    output_path = os.path.join(output_dir, "screenshot_timeline.png")
+    output_path = os.path.join(output_dir, "html_timeline.png")
     plt.savefig(output_path, dpi=150, bbox_inches="tight")
     plt.close()
     
@@ -143,7 +143,7 @@ def create_daily_count_graph(data, output_dir):
     
     # グラフを保存
     os.makedirs(output_dir, exist_ok=True)
-    output_path = os.path.join(output_dir, "daily_screenshot_count.png")
+    output_path = os.path.join(output_dir, "daily_html_count.png")
     plt.savefig(output_path, dpi=150, bbox_inches="tight")
     plt.close()
     
@@ -183,7 +183,7 @@ def create_hourly_distribution_graph(data, output_dir):
 
 
 def save_to_csv(data, output_dir, csv_path):
-    """スクリーンショット情報をCSVに保存（追記形式）"""
+    """HTML情報をCSVに保存（追記形式）"""
     if not data:
         print("CSVに保存するデータがありません。")
         return None
@@ -225,7 +225,7 @@ def save_to_csv(data, output_dir, csv_path):
 
 
 def load_from_csv(csv_path):
-    """CSVファイルからスクリーンショット情報を読み込む"""
+    """CSVファイルからHTML情報を読み込む"""
     if not os.path.exists(csv_path):
         print(f"エラー: CSVファイルが見つかりません: {csv_path}")
         return None
@@ -250,11 +250,11 @@ def load_from_csv(csv_path):
     return data
 
 
-def analyze_screenshots():
+def analyze_html():
     """HTMLファイルを解析してグラフを作成"""
     html_dir = "html"
     output_dir = "graphs"
-    csv_path = os.path.join(output_dir, "screenshot_data.csv")
+    csv_path = os.path.join(output_dir, "html_data.csv")
     
     # 日本語フォントを設定
     setup_japanese_font()
@@ -290,7 +290,7 @@ def analyze_screenshots():
 
 if __name__ == "__main__":
     try:
-        analyze_screenshots()
+        analyze_html()
     except Exception as e:
         print(f"エラーが発生しました: {e}")
         import traceback

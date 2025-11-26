@@ -30,7 +30,7 @@ jobs:
 
       - name: Analyze HTML files and create graphs
         run: |
-          python analyze_screenshots.py
+          python analyze_html.py
 
       - name: Commit and push graphs and CSV
         run: |

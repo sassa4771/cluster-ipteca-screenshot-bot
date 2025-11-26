@@ -147,7 +147,7 @@ cluster-ipteca-screenshot-bot/
 ├── take_screenshot.py          # スクリーンショット取得スクリプト
 ├── fetch_html.py               # HTML取得スクリプト
 ├── notify_discord.py           # Discord通知スクリプト
-├── analyze_screenshots.py      # スクリーンショット解析・グラフ作成スクリプト
+├── analyze_html.py              # HTML解析・グラフ作成スクリプト
 ├── config.json                 # 設定ファイル
 ├── screenshots/                # スクリーンショット保存ディレクトリ（Gitにコミットされる）
 ├── html/                       # HTML保存ディレクトリ（Gitにコミットされる）
@@ -162,7 +162,7 @@ cluster-ipteca-screenshot-bot/
 
 - **take_screenshot.py**: `playwright`
 - **notify_discord.py**: `requests`
-- **analyze_screenshots.py**: `pandas`, `matplotlib`
+- **analyze_html.py**: `pandas`, `matplotlib`
 
 ## トラブルシューティング
 
