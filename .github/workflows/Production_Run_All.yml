@@ -5,14 +5,7 @@ permissions:
 
 on:
   schedule:
-    # JST 9:00
-    - cron: '0 0 * * *'
-    # JST 12:00
-    - cron: '0 3 * * *'
-    # JST 15:00
-    - cron: '0 6 * * *'
-    # JST 18:00
-    - cron: '0 9 * * *'
+    - cron: '*/5 * * * *'  # 5分ごとに実行（UTC）
   workflow_dispatch: {}  # 手動実行用
 
 jobs:
