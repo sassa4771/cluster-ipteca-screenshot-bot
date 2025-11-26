@@ -93,7 +93,7 @@ def get_screenshot_files(save_dir):
 
 
 def create_timeline_graph(data, output_dir):
-    """スクリーンショット取得のタイムライングラフを作成"""
+    """HTML取得のタイムライングラフを作成"""
     if not data:
         print("グラフを作成するデータがありません。")
         return None
@@ -104,8 +104,8 @@ def create_timeline_graph(data, output_dir):
     plt.figure(figsize=(12, 6))
     plt.plot(df["date"], range(len(df)), marker="o", linestyle="-", markersize=8)
     plt.xlabel("日時 (JST)", fontsize=12)
-    plt.ylabel("スクリーンショット取得回数（累積）", fontsize=12)
-    plt.title("IPTeCA スクリーンショット取得タイムライン", fontsize=14, fontweight="bold")
+    plt.ylabel("HTML取得回数（累積）", fontsize=12)
+    plt.title("IPTeCA HTML取得タイムライン", fontsize=14, fontweight="bold")
     plt.xticks(rotation=45, ha="right")
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
@@ -121,7 +121,7 @@ def create_timeline_graph(data, output_dir):
 
 
 def create_daily_count_graph(data, output_dir):
-    """日別のスクリーンショット取得数をグラフ化"""
+    """日別のHTML取得数をグラフ化"""
     if not data:
         print("グラフを作成するデータがありません。")
         return None
@@ -136,7 +136,7 @@ def create_daily_count_graph(data, output_dir):
     plt.bar(daily_counts["date_only"], daily_counts["count"], color="steelblue", alpha=0.7)
     plt.xlabel("日付", fontsize=12)
     plt.ylabel("取得回数", fontsize=12)
-    plt.title("IPTeCA スクリーンショット取得数（日別）", fontsize=14, fontweight="bold")
+    plt.title("IPTeCA HTML取得数（日別）", fontsize=14, fontweight="bold")
     plt.xticks(rotation=45, ha="right")
     plt.grid(True, alpha=0.3, axis="y")
     plt.tight_layout()
@@ -152,7 +152,7 @@ def create_daily_count_graph(data, output_dir):
 
 
 def create_hourly_distribution_graph(data, output_dir):
-    """時間帯別の取得分布をグラフ化"""
+    """時間帯別のHTML取得分布をグラフ化"""
     if not data:
         print("グラフを作成するデータがありません。")
         return None
@@ -167,7 +167,7 @@ def create_hourly_distribution_graph(data, output_dir):
     plt.bar(hourly_counts["hour"], hourly_counts["count"], color="coral", alpha=0.7)
     plt.xlabel("時間帯 (JST)", fontsize=12)
     plt.ylabel("取得回数", fontsize=12)
-    plt.title("IPTeCA スクリーンショット取得数（時間帯別）", fontsize=14, fontweight="bold")
+    plt.title("IPTeCA HTML取得数（時間帯別）", fontsize=14, fontweight="bold")
     plt.xticks(range(0, 24), [f"{h:02d}:00" for h in range(24)], rotation=45, ha="right")
     plt.grid(True, alpha=0.3, axis="y")
     plt.tight_layout()
@@ -251,25 +251,23 @@ def load_from_csv(csv_path):
 
 
 def analyze_screenshots():
-    """スクリーンショットを解析してグラフを作成"""
-    config = load_config()
-    screenshot_config = config["screenshot"]
-    save_dir = screenshot_config["save_dir"]
+    """HTMLファイルを解析してグラフを作成"""
+    html_dir = "html"
     output_dir = "graphs"
     csv_path = os.path.join(output_dir, "screenshot_data.csv")
     
     # 日本語フォントを設定
     setup_japanese_font()
     
-    # スクリーンショットファイルを取得
-    print(f"screenshotsフォルダをスキャン中: {save_dir}")
-    data = get_screenshot_files(save_dir)
+    # HTMLファイルを取得
+    print(f"htmlフォルダをスキャン中: {html_dir}")
+    data = get_html_files(html_dir)
     
     if not data:
-        print(f"エラー: {save_dir} フォルダにスクリーンショットファイルが見つかりませんでした。")
+        print(f"エラー: {html_dir} フォルダにHTMLファイルが見つかりませんでした。")
         sys.exit(1)
     
-    print(f"スクリーンショットファイルを {len(data)} 件見つけました。")
+    print(f"HTMLファイルを {len(data)} 件見つけました。")
     
     # CSVに保存（追記形式）
     save_to_csv(data, output_dir, csv_path)

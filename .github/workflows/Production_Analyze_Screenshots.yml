@@ -28,7 +28,7 @@ jobs:
         run: |
           pip install pandas matplotlib
 
-      - name: Analyze screenshots and create graphs
+      - name: Analyze HTML files and create graphs
         run: |
           python analyze_screenshots.py
 
