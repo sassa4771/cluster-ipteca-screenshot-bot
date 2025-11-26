@@ -1,15 +1,15 @@
-name: Production Upload to pCloud
+name: Production Run All
 
 on:
   schedule:
-    # JST 9:10
-    - cron: '10 0 * * *'
-    # JST 17:10
-    - cron: '10 8 * * *'
+    # JST 9:00
+    - cron: '0 0 * * *'
+    # JST 17:00
+    - cron: '0 8 * * *'
   workflow_dispatch: {}  # 手動実行用
 
 jobs:
-  upload:
+  run_all:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,13 +26,29 @@ jobs:
           pip install playwright requests
           python -m playwright install --with-deps chromium
 
-      - name: Take screenshot (if not exists)
+      - name: Take screenshot
         run: |
-          python take_screenshot.py || echo "Screenshot already exists or failed"
+          python take_screenshot.py
+
+      - name: Wait 5 minutes
+        run: |
+          sleep 300
+
+      - name: Check result and notify
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          python notify_discord.py
 
       - name: Upload to pCloud
         env:
           PCLOUD_UPLOAD_CODE: ${{ secrets.PCLOUD_UPLOAD_CODE }}
         run: |
           python upload_pcloud.py
+
+      - name: Upload screenshots as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-screenshot-${{ github.run_number }}
+          path: screenshots/
 

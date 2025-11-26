@@ -20,9 +20,8 @@ Cluster検索結果のスクリーンショットを自動取得し、Discord通
 
 #### 本番用（自動実行）
 
-- `Production_Screenshot.yml` - スクリーンショット取得（9:00 / 17:00 JST）
-- `Production_Notify_Discord.yml` - Discord通知（9:05 / 17:05 JST）
-- `Production_Upload_pCloud.yml` - pCloudアップロード（9:10 / 17:10 JST）
+- `Production_Run_All.yml` - 全体実行（9:00 / 17:00 JST）
+  - スクリーンショット取得 → 5分待機 → Discord通知 → pCloudアップロード
 
 #### テスト用（手動実行のみ）
 
@@ -157,9 +156,7 @@ cluster-ipteca-screenshot-bot/
 ├── screenshots/                # スクリーンショット保存ディレクトリ
 └── .github/
     └── workflows/
-        ├── Production_Screenshot.yml      # スクリーンショット取得（本番）
-        ├── Production_Notify_Discord.yml  # Discord通知（本番）
-        ├── Production_Upload_pCloud.yml   # pCloudアップロード（本番）
+        ├── Production_Run_All.yml         # 全体実行（本番）
         ├── Test_Quick.yml                 # 全体テスト（テスト用）
         └── Test_Screenshot_Only.yml       # スクリーンショットのみテスト（テスト用）
 ```
