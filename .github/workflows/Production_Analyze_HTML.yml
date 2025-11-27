@@ -5,8 +5,8 @@ permissions:
 
 on:
   schedule:
-    # JST 24:00 (毎日1回)
-    - cron: '0 15 * * *'   # 15:00 UTC = 翌日 0:00 JST
+    # JST 25:00 (毎日1回)
+    - cron: '0 16 * * *'   # 16:00 UTC = 翌日 1:00 JST
   workflow_dispatch: {}  # 手動実行用
 
 jobs:
@@ -26,7 +26,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pandas matplotlib
+          pip install pandas matplotlib beautifulsoup4 lxml
 
       - name: Analyze HTML files and create graphs
         run: |
@@ -43,6 +43,16 @@ jobs:
             git commit -m "Update graphs and CSV: $(TZ=Asia/Tokyo date +'%Y%m%d_%H%M%S_JST')"
             git push
           fi
+
+      - name: Install requests for Discord notification
+        run: |
+          pip install requests
+
+      - name: Notify Discord with graphs
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          python notify_graphs_discord.py
 
       - name: Upload graphs as artifact
         uses: actions/upload-artifact@v4
