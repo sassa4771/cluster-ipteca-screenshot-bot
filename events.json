@@ -1,0 +1,33 @@
+{
+  "説明": "イベント情報を管理します。日時、説明、色、線のスタイルを指定できます。",
+  "薄さの調整": {
+    "line_alpha": "線の透明度（0.0-1.0、指定しない場合はalpha * 0.5を使用）",
+    "text_alpha": "テキストの透明度（0.0-1.0、デフォルト: 0.7）",
+    "text_color_lightness": "テキストの色の薄さ（0.0-1.0、大きいほど薄い、デフォルト: 0.7）"
+  },
+  "events": [
+    {
+      "date": "2025-11-17 17:00:00",
+      "description": "ワールドの公開",
+      "color": "blue",
+      "linestyle": "dashed",
+      "linewidth": 2,
+      "alpha": 0.7,
+      "line_alpha": 0.35,
+      "text_alpha": 0.7,
+      "text_color_lightness": 0.7
+    },
+    {
+      "date": "2025-11-25 16:30:00",
+      "description": "メタバース文化論",
+      "color": "red",
+      "linestyle": "dashed",
+      "linewidth": 2,
+      "alpha": 0.7,
+      "line_alpha": 0.35,
+      "text_alpha": 0.7,
+      "text_color_lightness": 0.7
+    }
+  ]
+}
+

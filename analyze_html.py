@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import font_manager
+import matplotlib.colors as mcolors
 from bs4 import BeautifulSoup
 
 # 日本語フォントの設定
@@ -305,7 +306,106 @@ def create_hourly_distribution_graph(data, output_dir):
     return output_path
 
 
-def create_zone_visitors_graph(data, output_dir):
+def load_events(events_path="events.json"):
+    """イベント情報をJSONファイルから読み込む"""
+    if not os.path.exists(events_path):
+        return []
+    
+    try:
+        with open(events_path, "r", encoding="utf-8") as f:
+            events_data = json.load(f)
+        
+        if "events" not in events_data:
+            return []
+        
+        jst = ZoneInfo("Asia/Tokyo")
+        events = []
+        
+        for event in events_data["events"]:
+            try:
+                # 日時をdatetimeオブジェクトに変換
+                event_date = datetime.strptime(event["date"], "%Y-%m-%d %H:%M:%S")
+                event_date = event_date.replace(tzinfo=jst)
+                
+                event_info = {
+                    "date": event_date,
+                    "description": event.get("description", ""),
+                    "color": event.get("color", "red"),
+                    "linestyle": event.get("linestyle", "dashed"),
+                    "linewidth": event.get("linewidth", 2),
+                    "alpha": event.get("alpha", 0.7),
+                    "line_alpha": event.get("line_alpha", None),  # 線の透明度（Noneの場合はalpha * 0.5を使用）
+                    "text_alpha": event.get("text_alpha", 0.7),  # テキストの透明度
+                    "text_color_lightness": event.get("text_color_lightness", 0.7)  # テキストの色の薄さ（0.0-1.0、大きいほど薄い）
+                }
+                events.append(event_info)
+            except Exception as e:
+                print(f"警告: イベントの解析に失敗しました: {event}, エラー: {e}")
+                continue
+        
+        return events
+    except Exception as e:
+        print(f"警告: イベントファイルの読み込みに失敗しました: {e}")
+        return []
+
+
+def add_events_to_graph(ax, events, y_min, y_max):
+    """グラフにイベント情報を重畳表示"""
+    if not events:
+        return
+    
+    for i, event in enumerate(events):
+        event_date = event["date"]
+        description = event["description"]
+        color = event["color"]
+        linestyle = event["linestyle"]
+        linewidth = event["linewidth"]
+        alpha = event["alpha"]
+        line_alpha = event.get("line_alpha")  # 線の透明度（Noneの場合はalpha * 0.5を使用）
+        text_alpha = event.get("text_alpha", 0.7)  # テキストの透明度
+        text_color_lightness = event.get("text_color_lightness", 0.7)  # テキストの色の薄さ
+        
+        # 垂直線を描画（透明度をJSONで調整可能）
+        if line_alpha is None:
+            line_alpha = alpha * 0.5
+        ax.axvline(x=event_date, color=color, linestyle=linestyle, 
+                   linewidth=linewidth, alpha=line_alpha, zorder=10)
+        
+        # 日付をフォーマット（例: 2025/11/17 17:00）
+        date_str = event_date.strftime("%Y/%m/%d %H:%M")
+        
+        # テキストに日付と説明を含める
+        text = f"{date_str}\n{description}"
+        
+        # テキストアノテーションを追加（横書き、透明度をJSONで調整可能）
+        # イベントが複数ある場合、縦方向にずらして表示
+        y_offset = y_max - (y_max - y_min) * 0.15 * (i % 4 + 1)
+        
+        # 色を薄くする（RGB値を調整、JSONで調整可能）
+        if isinstance(color, str):
+            rgb = mcolors.to_rgb(color)
+        else:
+            rgb = color
+        # 色を薄くする（白を混ぜる、text_color_lightnessで調整）
+        light_color = tuple((1.0 - text_color_lightness) * c + text_color_lightness * 1.0 for c in rgb)
+        
+        ax.annotate(
+            text,
+            xy=(event_date, y_offset),
+            xytext=(10, 10),
+            textcoords="offset points",
+            fontsize=10,
+            fontweight="normal",
+            color=light_color,
+            bbox=dict(boxstyle="round,pad=0.5", facecolor="white", edgecolor=light_color, alpha=text_alpha, linewidth=1.0),
+            arrowprops=dict(arrowstyle="->", color=light_color, lw=1.0, alpha=text_alpha * 0.85),
+            rotation=0,
+            ha="left",
+            va="bottom"
+        )
+
+
+def create_zone_visitors_graph(data, output_dir, events=None):
     """各ゾーンの来場者数の時系列グラフを作成"""
     if not data:
         print("グラフを作成するデータがありません。")
@@ -331,6 +431,11 @@ def create_zone_visitors_graph(data, output_dir):
     y_ticks = np.arange(int(y_min), int(y_max) + 1, max(1, int((y_max - y_min) / 10)))
     ax.set_yticks(y_ticks)
     ax.tick_params(axis='y', labelsize=18, labelcolor='black')
+    
+    # イベント情報を重畳表示
+    if events:
+        add_events_to_graph(ax, events, y_min, y_max)
+    
     # 凡例をx軸のタイトルの下に配置（さらに下に）
     legend_font = font_manager.FontProperties(weight='bold', size=18)
     ax.legend(bbox_to_anchor=(0.5, -0.2), loc='upper center', ncol=3, prop=legend_font, frameon=True)
@@ -349,7 +454,7 @@ def create_zone_visitors_graph(data, output_dir):
     return output_path
 
 
-def create_zone_likes_graph(data, output_dir):
+def create_zone_likes_graph(data, output_dir, events=None):
     """各ゾーンのいいね数の時系列グラフを作成"""
     if not data:
         print("グラフを作成するデータがありません。")
@@ -375,6 +480,11 @@ def create_zone_likes_graph(data, output_dir):
     y_ticks = np.arange(int(y_min), int(y_max) + 1, max(1, int((y_max - y_min) / 10)))
     ax.set_yticks(y_ticks)
     ax.tick_params(axis='y', labelsize=18, labelcolor='black')
+    
+    # イベント情報を重畳表示
+    if events:
+        add_events_to_graph(ax, events, y_min, y_max)
+    
     # 凡例をx軸のタイトルの下に配置（さらに下に）
     legend_font = font_manager.FontProperties(weight='bold', size=18)
     ax.legend(bbox_to_anchor=(0.5, -0.2), loc='upper center', ncol=3, prop=legend_font, frameon=True)
@@ -442,8 +552,46 @@ def save_to_csv(data, output_dir, csv_path):
     return csv_path
 
 
+def normalize_datetime_str(dt_str, filename=None):
+    """日時文字列を正規化する（様々な形式に対応）"""
+    if pd.isna(dt_str) or str(dt_str).strip() == "":
+        # filenameから日時を抽出
+        if filename and filename.startswith("IPTeCA_"):
+            try:
+                if filename.endswith("_JST.html"):
+                    timestamp_str = filename.replace("IPTeCA_", "").replace("_JST.html", "")
+                elif filename.endswith("_JST.png"):
+                    timestamp_str = filename.replace("IPTeCA_", "").replace("_JST.png", "")
+                else:
+                    return None
+                dt = datetime.strptime(timestamp_str, "%Y%m%d_%H%M%S")
+                return dt.strftime("%Y-%m-%d %H:%M:%S")
+            except Exception:
+                return None
+        return None
+    
+    dt_str = str(dt_str).strip()
+    
+    # スラッシュ区切りをハイフン区切りに変換
+    dt_str = dt_str.replace("/", "-")
+    
+    # 時刻が不完全な場合（例: "2025-11-19 8:33"）を補完
+    # "YYYY-MM-DD H:MM" 形式を "YYYY-MM-DD HH:MM:SS" に変換
+    if re.match(r'^\d{4}-\d{2}-\d{2} \d{1,2}:\d{2}$', dt_str):
+        # 秒を追加
+        dt_str = dt_str + ":00"
+    elif re.match(r'^\d{4}-\d{2}-\d{2} \d{1,2}:\d{2}:\d{2}$', dt_str):
+        # 既に秒がある場合はそのまま
+        pass
+    elif re.match(r'^\d{4}-\d{2}-\d{2}$', dt_str):
+        # 日付のみの場合は時刻を追加
+        dt_str = dt_str + " 00:00:00"
+    
+    return dt_str
+
+
 def load_from_csv(csv_path):
-    """CSVファイルからHTML情報を読み込む"""
+    """CSVファイルからHTML情報を読み込む（HTMLファイルと手動データの両方を含む）"""
     if not os.path.exists(csv_path):
         print(f"エラー: CSVファイルが見つかりません: {csv_path}")
         return None
@@ -451,9 +599,54 @@ def load_from_csv(csv_path):
     df = pd.read_csv(csv_path, encoding="utf-8-sig")
     jst = ZoneInfo("Asia/Tokyo")
     
+    # 日時文字列を正規化
+    for idx, row in df.iterrows():
+        filename = row.get("filename", "")
+        date_str = normalize_datetime_str(row.get("date_str"), filename)
+        if date_str:
+            df.at[idx, "date_str"] = date_str
+        
+        # file_date_strが空の場合は、date_strと同じ値を使用
+        file_date_str = row.get("file_date_str")
+        if pd.isna(file_date_str) or str(file_date_str).strip() == "":
+            df.at[idx, "file_date_str"] = df.at[idx, "date_str"]
+        else:
+            file_date_str = normalize_datetime_str(file_date_str, filename)
+            if file_date_str:
+                df.at[idx, "file_date_str"] = file_date_str
+    
     # 日時文字列をdatetimeオブジェクトに変換
-    df["date"] = pd.to_datetime(df["date_str"]).dt.tz_localize(jst)
-    df["file_date"] = pd.to_datetime(df["file_date_str"]).dt.tz_localize(jst)
+    try:
+        df["date"] = pd.to_datetime(df["date_str"], errors="coerce").dt.tz_localize(jst, ambiguous="infer")
+    except Exception as e:
+        print(f"警告: 日時の変換でエラーが発生しました: {e}")
+        # フォールバック: ファイル名から日時を抽出
+        for idx, row in df.iterrows():
+            if pd.isna(df.at[idx, "date"]):
+                filename = row.get("filename", "")
+                if filename.startswith("IPTeCA_"):
+                    try:
+                        if filename.endswith("_JST.html"):
+                            timestamp_str = filename.replace("IPTeCA_", "").replace("_JST.html", "")
+                        elif filename.endswith("_JST.png"):
+                            timestamp_str = filename.replace("IPTeCA_", "").replace("_JST.png", "")
+                        else:
+                            continue
+                        dt = datetime.strptime(timestamp_str, "%Y%m%d_%H%M%S")
+                        df.at[idx, "date"] = dt.replace(tzinfo=jst)
+                    except Exception:
+                        pass
+    
+    try:
+        df["file_date"] = pd.to_datetime(df["file_date_str"], errors="coerce").dt.tz_localize(jst, ambiguous="infer")
+        # file_dateがNaNの場合は、dateと同じ値を使用
+        df["file_date"] = df["file_date"].fillna(df["date"])
+    except Exception as e:
+        print(f"警告: file_dateの変換でエラーが発生しました: {e}")
+        df["file_date"] = df["date"]
+    
+    # dateがNaNの行を除外
+    df = df.dropna(subset=["date"])
     
     # データ形式を統一（ゾーンデータも含める）
     data = []
@@ -470,9 +663,12 @@ def load_from_csv(csv_path):
             visitors_col = f"{zone_name}_visitors"
             likes_col = f"{zone_name}_likes"
             if visitors_col in df.columns:
-                row_data[visitors_col] = row.get(visitors_col, 0)
+                # NaNの場合は0に変換
+                value = row.get(visitors_col, 0)
+                row_data[visitors_col] = 0 if pd.isna(value) else float(value)
             if likes_col in df.columns:
-                row_data[likes_col] = row.get(likes_col, 0)
+                value = row.get(likes_col, 0)
+                row_data[likes_col] = 0 if pd.isna(value) else float(value)
         
         data.append(row_data)
     
@@ -488,35 +684,54 @@ def analyze_html():
     # 日本語フォントを設定
     setup_japanese_font()
     
-    # HTMLファイルを取得
-    print(f"htmlフォルダをスキャン中: {html_dir}")
-    data = get_html_files(html_dir)
-    
-    if not data:
-        print(f"エラー: {html_dir} フォルダにHTMLファイルが見つかりませんでした。")
-        sys.exit(1)
-    
-    print(f"HTMLファイルを {len(data)} 件見つけました。")
-    
-    # CSVに保存（追記形式）
-    save_to_csv(data, output_dir, csv_path)
-    
-    # グラフ作成用にCSVから全データを読み込む
+    # 既存のCSVファイルから全データを読み込む（手動データも含む）
+    all_data = []
     if os.path.exists(csv_path):
         print(f"CSVファイルから全データを読み込みます: {csv_path}")
         data_from_csv = load_from_csv(csv_path)
         if data_from_csv:
-            data = data_from_csv
-            print(f"CSVから {len(data)} 件のデータを読み込みました。")
+            all_data.extend(data_from_csv)
+            print(f"CSVから {len(data_from_csv)} 件のデータを読み込みました。")
+    
+    # HTMLファイルを取得
+    print(f"htmlフォルダをスキャン中: {html_dir}")
+    html_data = get_html_files(html_dir)
+    
+    if html_data:
+        print(f"HTMLファイルを {len(html_data)} 件見つけました。")
+        # HTMLデータをCSVに保存（追記形式、重複は上書き）
+        save_to_csv(html_data, output_dir, csv_path)
+        
+        # 更新されたCSVから全データを再読み込み
+        print(f"更新されたCSVファイルから全データを再読み込みます: {csv_path}")
+        data_from_csv = load_from_csv(csv_path)
+        if data_from_csv:
+            all_data = data_from_csv
+            print(f"CSVから {len(data_from_csv)} 件のデータを読み込みました。")
+    elif not all_data:
+        print(f"エラー: {html_dir} フォルダにHTMLファイルが見つからず、CSVファイルもありませんでした。")
+        sys.exit(1)
+    
+    if not all_data:
+        print("エラー: グラフを作成するデータがありません。")
+        sys.exit(1)
+    
+    # 日時でソート
+    all_data.sort(key=lambda x: x["date"])
+    
+    # イベント情報を読み込む
+    events = load_events("events.json")
+    if events:
+        print(f"イベント情報を {len(events)} 件読み込みました。")
     
     # グラフを作成
-    create_timeline_graph(data, output_dir)
-    create_daily_count_graph(data, output_dir)
-    create_hourly_distribution_graph(data, output_dir)
+    create_timeline_graph(all_data, output_dir)
+    create_daily_count_graph(all_data, output_dir)
+    create_hourly_distribution_graph(all_data, output_dir)
     
-    # ゾーンデータのグラフを作成
-    create_zone_visitors_graph(data, output_dir)
-    create_zone_likes_graph(data, output_dir)
+    # ゾーンデータのグラフを作成（イベント情報を重畳表示）
+    create_zone_visitors_graph(all_data, output_dir, events=events)
+    create_zone_likes_graph(all_data, output_dir, events=events)
     
     print(f"\nすべてのグラフとCSVを {output_dir}/ フォルダに保存しました。")
 
