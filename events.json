@@ -27,6 +27,17 @@
       "line_alpha": 0.35,
       "text_alpha": 0.7,
       "text_color_lightness": 0.7
+    },
+    {
+      "date": "2025-12-08 10:00:00",
+      "description": "IPTeCAシンポジウム",
+      "color": "green",
+      "linestyle": "dashed",
+      "linewidth": 2,
+      "alpha": 0.7,
+      "line_alpha": 0.35,
+      "text_alpha": 0.7,
+      "text_color_lightness": 0.7
     }
   ]
 }
