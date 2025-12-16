@@ -78,9 +78,20 @@ ZONE_SHORT_NAMES = [
     "ものづくり教育",
 ]
 
+# ゾーン番号とゾーン名の対応
+ZONE_NUMBERS = {
+    "01": "エントランス",
+    "02": "メインロビー",
+    "03": "研究成果・技術内容",
+    "04": "CSAP",
+    "05": "地域貢献・展開",
+    "06": "ものづくり教育",
+}
+
 
 def extract_zone_data_from_html(html_path):
-    """HTMLファイルから各ゾーンの来場者数といいね数を抽出"""
+    """HTMLファイルから各ゾーンの来場者数といいね数を抽出
+    SVGアイコン（♥と▶）を基準に数値を取得する（クラス名非依存）"""
     try:
         with open(html_path, "r", encoding="utf-8") as f:
             html_content = f.read()
@@ -90,73 +101,120 @@ def extract_zone_data_from_html(html_path):
         # データを格納する辞書
         zone_data = {}
         
-        # ワールドリストのコンテナを探す
-        # 実際のHTMLでは <div class="sc-hVAhbL dCaYTa"> がワールドのリスト
-        world_list = soup.find("div", class_=lambda x: x and "sc-hVAhbL" in str(x) and "dCaYTa" in str(x))
+        # ワールドカード（a[href^="/w/"]）を全て取得
+        world_cards = soup.find_all("a", href=lambda x: x and x.startswith("/w/"))
         
-        if not world_list:
-            # フォールバック: ワールドの検索結果を含むdivを探す
-            world_list = soup.find("div", class_=lambda x: x and "dCaYTa" in str(x))
-        
-        if not world_list:
-            print(f"警告: ワールドリストのコンテナが見つかりませんでした")
-            return {}
-        
-        # ワールドリスト内の各spanタグ（ワールドエントリ）を取得
-        world_entries = world_list.find_all("span", recursive=False)
-        
-        # 各ワールドエントリからデータを抽出
-        for entry in world_entries:
-            # ゾーン名を取得: divタグのclass="sc-bHxkSF sc-hWnafN dkgfSI jwSkg"
-            zone_name_div = entry.find("div", class_=lambda x: x and "sc-bHxkSF" in str(x) and "jwSkg" in str(x))
+        for card in world_cards:
+            # カード内のタイトル要素を探す（最も長いテキストまたは見出し相当のノード）
+            name = None
+            title_candidates = []
             
-            if not zone_name_div:
-                # フォールバック: ゾーン名を含むdivを探す
-                zone_name_div = entry.find("div", class_=lambda x: x and "jwSkg" in str(x))
+            # div内のテキストを候補として収集
+            for div in card.find_all("div", recursive=True):
+                text = div.get_text(strip=True)
+                if text and len(text) > 10:  # 短すぎるテキストは除外
+                    title_candidates.append((len(text), text))
             
-            if not zone_name_div:
+            if title_candidates:
+                # 最も長いテキストをタイトルとして採用
+                title_candidates.sort(reverse=True, key=lambda x: x[0])
+                name = title_candidates[0][1]
+            
+            if not name:
                 continue
-            
-            zone_name_text = zone_name_div.get_text(strip=True)
             
             # ゾーン名から短い名前を抽出（例：「02.IPTeCAバーチャル・イノベーション展示館：メインロビー」→「メインロビー」）
             matched_zone = None
             for short_name in ZONE_SHORT_NAMES:
-                if short_name in zone_name_text:
+                if short_name in name:
                     matched_zone = short_name
                     break
             
             if not matched_zone:
                 continue
             
-            # いいね数を取得: divタグのclass="sc-gFSHlz liSAWz"の下のspanタグ
-            likes_div = entry.find("div", class_=lambda x: x and "sc-gFSHlz" in str(x) and "liSAWz" in str(x))
+            # カード内の全てのsvgを走査
             likes = 0
-            if likes_div:
-                likes_span = likes_div.find("span")
-                if likes_span:
-                    likes_text = likes_span.get_text(strip=True)
-                    # 数値を抽出（カンマ区切りの可能性がある）
-                    likes_match = re.search(r'[\d,]+', likes_text.replace(',', ''))
-                    if likes_match:
-                        likes = int(likes_match.group().replace(',', ''))
-            
-            # 訪問回数を取得: divタグのclass="sc-gsZtZH idzaML"の下のspanタグ
-            visitors_div = entry.find("div", class_=lambda x: x and "sc-gsZtZH" in str(x) and "idzaML" in str(x))
             visitors = 0
-            if visitors_div:
-                visitors_span = visitors_div.find("span")
-                if visitors_span:
-                    visitors_text = visitors_span.get_text(strip=True)
-                    # 数値を抽出（カンマ区切りの可能性がある）
-                    visitors_match = re.search(r'[\d,]+', visitors_text.replace(',', ''))
-                    if visitors_match:
-                        visitors = int(visitors_match.group().replace(',', ''))
             
-            zone_data[matched_zone] = {
-                "visitors": visitors,
-                "likes": likes
-            }
+            svgs = card.find_all("svg", recursive=True)
+            for svg in svgs:
+                # svg内のpath要素を探す
+                paths = svg.find_all("path", recursive=True)
+                for path in paths:
+                    d_attr = path.get("d", "")
+                    
+                    # Heart（♥）判定: dが"M60.004"で始まる
+                    if d_attr.startswith("M60.004"):
+                        # svgの親要素内で、svgの次のspanを探す
+                        parent = svg.parent
+                        if parent:
+                            # 親要素内でsvgの後に来る最初のspanを探す
+                            found_span = svg.find_next_sibling("span")
+                            
+                            # 見つからない場合、親要素内の全てのspanを探す
+                            if not found_span:
+                                all_spans = parent.find_all("span", recursive=False)
+                                # svgの後に来る最初のspanを探す
+                                svg_index = None
+                                for i, child in enumerate(parent.children):
+                                    if child == svg:
+                                        svg_index = i
+                                        break
+                                
+                                if svg_index is not None:
+                                    for i, child in enumerate(parent.children):
+                                        if i > svg_index and child.name == "span":
+                                            found_span = child
+                                            break
+                            
+                            if found_span:
+                                likes_text = found_span.get_text(strip=True)
+                                likes_match = re.search(r'[\d,]+', likes_text.replace(',', ''))
+                                if likes_match:
+                                    likes = int(likes_match.group().replace(',', ''))
+                    
+                    # Play（▶）判定: dが"M38.678"で始まる
+                    elif d_attr.startswith("M38.678"):
+                        # svgの親要素内で、svgの次のspanを探す
+                        parent = svg.parent
+                        if parent:
+                            # 親要素内でsvgの後に来る最初のspanを探す
+                            found_span = svg.find_next_sibling("span")
+                            
+                            # 見つからない場合、親要素内の全てのspanを探す
+                            if not found_span:
+                                all_spans = parent.find_all("span", recursive=False)
+                                # svgの後に来る最初のspanを探す
+                                svg_index = None
+                                for i, child in enumerate(parent.children):
+                                    if child == svg:
+                                        svg_index = i
+                                        break
+                                
+                                if svg_index is not None:
+                                    for i, child in enumerate(parent.children):
+                                        if i > svg_index and child.name == "span":
+                                            found_span = child
+                                            break
+                            
+                            if found_span:
+                                visitors_text = found_span.get_text(strip=True)
+                                visitors_match = re.search(r'[\d,]+', visitors_text.replace(',', ''))
+                                if visitors_match:
+                                    visitors = int(visitors_match.group().replace(',', ''))
+            
+            # データが取得できた場合のみ追加
+            if matched_zone:
+                zone_data[matched_zone] = {
+                    "visitors": visitors,
+                    "likes": likes
+                }
+                # デバッグ用：片方しか取れない場合は警告
+                if likes == 0 and visitors > 0:
+                    print(f"警告: {matched_zone} のいいね数が取得できませんでした（訪問者数: {visitors}）")
+                elif visitors == 0 and likes > 0:
+                    print(f"警告: {matched_zone} の訪問者数が取得できませんでした（いいね数: {likes}）")
         
         return zone_data
     except Exception as e:
@@ -166,7 +224,7 @@ def extract_zone_data_from_html(html_path):
         return {}
 
 
-def get_html_files(html_dir):
+def get_html_files(html_dir, screenshots_dir="screenshots"):
     """htmlフォルダ内のHTMLファイルを取得し、日時情報とゾーンデータを抽出"""
     pattern = os.path.join(html_dir, "*.html")
     files = glob.glob(pattern)
