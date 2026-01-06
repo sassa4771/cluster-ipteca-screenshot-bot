@@ -49,7 +49,28 @@
       "line_alpha": 0.35,
       "text_alpha": 0.7,
       "text_color_lightness": 0.7
+    },
+    {
+      "date": "2025-12-23 16:30:00",
+      "description": "雑談系の見学会",
+      "color": "purple",
+      "linestyle": "dashed",
+      "linewidth": 2,
+      "alpha": 0.7,
+      "line_alpha": 0.35,
+      "text_alpha": 0.7,
+      "text_color_lightness": 0.7
+    },
+    {
+      "date": "2025-12-30 21:00:00",
+      "description": "雑談系の見学会（地域展開枠版）",
+      "color": "blue",
+      "linestyle": "dashed",
+      "linewidth": 2,
+      "alpha": 0.7,
+      "line_alpha": 0.35,
+      "text_alpha": 0.7,
+      "text_color_lightness": 0.7
     }
   ]
 }
-
