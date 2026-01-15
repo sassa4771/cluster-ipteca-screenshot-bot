@@ -474,6 +474,8 @@ def create_zone_visitors_graph(data, output_dir, events=None):
     
     fig, ax = plt.subplots(figsize=(16, 10))
     
+    total_latest = 0
+
     for zone_name in ZONE_SHORT_NAMES:
         col_name = f"{zone_name}_visitors"
         if col_name in df.columns:
@@ -483,9 +485,11 @@ def create_zone_visitors_graph(data, output_dir, events=None):
             line, = ax.plot(series["date"], series[col_name], marker="o", label=zone_name, linewidth=2.5, markersize=8)
             # 最新点に値を表示
             last_row = series.iloc[-1]
+            val = float(last_row[col_name])
+            total_latest += val
             ts_str = last_row["date"].strftime("%Y/%m/%d %H:%M")
             ax.annotate(
-                f"{int(last_row[col_name])}\n{ts_str}",
+                f"{int(val)}人\n{ts_str}",
                 xy=(last_row["date"], last_row[col_name]),
                 xytext=(8, 0),
                 textcoords="offset points",
@@ -499,7 +503,7 @@ def create_zone_visitors_graph(data, output_dir, events=None):
     
     ax.set_xlabel("日時 (JST)", fontsize=20, fontweight="bold")
     ax.set_ylabel("来場者数", fontsize=20, fontweight="bold")
-    ax.set_title("IPTeCA 各ゾーン来場者数の推移", fontsize=22, fontweight="bold")
+    ax.set_title(f"IPTeCA 各ゾーン来場者数の推移（合計人数：{int(total_latest)}人）", fontsize=22, fontweight="bold")
     ax.tick_params(axis='x', rotation=45, labelsize=18)
     ax.tick_params(axis='x', which='major', labelsize=18, labelcolor='black')
     # 縦軸は整数のみ
