@@ -464,7 +464,7 @@ def add_events_to_graph(ax, events, y_min, y_max):
 
 
 def create_zone_visitors_graph(data, output_dir, events=None):
-    """各ゾーンの来場者数の時系列グラフを作成"""
+    """各ゾーンの来場者数の時系列グラフを作成し、最新点に値を表示"""
     if not data:
         print("グラフを作成するデータがありません。")
         return None
@@ -477,7 +477,25 @@ def create_zone_visitors_graph(data, output_dir, events=None):
     for zone_name in ZONE_SHORT_NAMES:
         col_name = f"{zone_name}_visitors"
         if col_name in df.columns:
-            ax.plot(df["date"], df[col_name], marker="o", label=zone_name, linewidth=2.5, markersize=8)
+            series = df[["date", col_name]].dropna()
+            if series.empty:
+                continue
+            line, = ax.plot(series["date"], series[col_name], marker="o", label=zone_name, linewidth=2.5, markersize=8)
+            # 最新点に値を表示
+            last_row = series.iloc[-1]
+            ts_str = last_row["date"].strftime("%Y/%m/%d %H:%M")
+            ax.annotate(
+                f"{int(last_row[col_name])}\n{ts_str}",
+                xy=(last_row["date"], last_row[col_name]),
+                xytext=(8, 0),
+                textcoords="offset points",
+                ha="left",
+                va="center",
+                fontsize=11,
+                fontweight="bold",
+                color=line.get_color(),
+                bbox=dict(boxstyle="round,pad=0.25", facecolor="white", edgecolor=line.get_color(), linewidth=0.8, alpha=0.85)
+            )
     
     ax.set_xlabel("日時 (JST)", fontsize=20, fontweight="bold")
     ax.set_ylabel("来場者数", fontsize=20, fontweight="bold")
