@@ -4,9 +4,9 @@ permissions:
   contents: write
 
 on:
-  schedule:
-    # JST 25:00 (毎日1回)
-    - cron: '0 16 * * *'   # 16:00 UTC = 翌日 1:00 JST
+  # schedule:
+  #   # JST 25:00 (毎日1回)
+  #   - cron: '0 16 * * *'   # 16:00 UTC = 翌日 1:00 JST
   workflow_dispatch: {}  # 手動実行用
 
 jobs:

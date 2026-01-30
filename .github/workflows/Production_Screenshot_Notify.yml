@@ -4,15 +4,15 @@ permissions:
   contents: write
 
 on:
-  schedule:
-    # JST 6:00
-    - cron: '0 21 * * *'   # 21:00 UTC = 翌日 6:00 JST
-    # JST 13:00
-    - cron: '0 4 * * *'    # 4:00 UTC = 13:00 JST
-    # JST 18:00
-    - cron: '0 9 * * *'    # 9:00 UTC = 18:00 JST
-    # JST 24:00
-    - cron: '0 15 * * *'   # 15:00 UTC = 翌日 0:00 JST
+  # schedule:
+  #   # JST 6:00
+  #   - cron: '0 21 * * *'   # 21:00 UTC = 翌日 6:00 JST
+  #   # JST 13:00
+  #   - cron: '0 4 * * *'    # 4:00 UTC = 13:00 JST
+  #   # JST 18:00
+  #   - cron: '0 9 * * *'    # 9:00 UTC = 18:00 JST
+  #   # JST 24:00
+  #   - cron: '0 15 * * *'   # 15:00 UTC = 翌日 0:00 JST
   workflow_dispatch: {}  # 手動実行用
 
 jobs:
