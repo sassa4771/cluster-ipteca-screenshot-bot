@@ -8,7 +8,7 @@
   "events": [
     {
       "date": "2025-11-17 17:00:00",
-      "description": "ワールドの公開",
+      "description": "ワールドの公開開始",
       "color": "blue",
       "linestyle": "dashed",
       "linewidth": 2,
@@ -20,7 +20,7 @@
     {
       "date": "2025-11-25 16:30:00",
       "description": "メタバース文化論",
-      "color": "red",
+      "color": "green",
       "linestyle": "dashed",
       "linewidth": 2,
       "alpha": 0.85,
@@ -31,7 +31,7 @@
     {
       "date": "2025-12-08 10:00:00",
       "description": "IPTeCAシンポジウム",
-      "color": "green",
+      "color": "red",
       "linestyle": "dashed",
       "linewidth": 2,
       "alpha": 0.85,
@@ -53,7 +53,7 @@
     {
       "date": "2025-12-23 16:30:00",
       "description": "雑談系の見学会",
-      "color": "red",
+      "color": "orange",
       "linestyle": "dashed",
       "linewidth": 2,
       "alpha": 0.85,
@@ -64,7 +64,7 @@
     {
       "date": "2025-12-30 21:00:00",
       "description": "雑談系の見学会（地域展開枠版）",
-      "color": "blue",
+      "color": "orange",
       "linestyle": "dashed",
       "linewidth": 2,
       "alpha": 0.85,
@@ -85,8 +85,30 @@
     },
     {
       "date": "2026-01-13 16:30:00",
-      "description": "メタバース文化論",
+      "description": "プレスリリース第2回見学ツアー",
       "color": "purple",
+      "linestyle": "dashed",
+      "linewidth": 2,
+      "alpha": 0.85,
+      "line_alpha": 0.35,
+      "text_alpha": 0.85,
+      "text_color_lightness": 0.7
+    },
+    {
+      "date": "2026-01-28 15:30:00",
+      "description": "プレスリリース第3回見学ツアー",
+      "color": "purple",
+      "linestyle": "dashed",
+      "linewidth": 2,
+      "alpha": 0.85,
+      "line_alpha": 0.35,
+      "text_alpha": 0.85,
+      "text_color_lightness": 0.7
+    },
+    {
+      "date": "2025-11-17 18:00:00",
+      "description": "ワールドの公開終了",
+      "color": "blue",
       "linestyle": "dashed",
       "linewidth": 2,
       "alpha": 0.85,
